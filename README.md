@@ -37,11 +37,11 @@ Architecture：
 
 In the `input` folder, there is a sample input file named `crackhost2.log`, which records both normal system log behavior and password theft attacks over a period of time. The attack chain is illustrated in the following diagram:
 
-<img src="imgs\crackhost2.png" alt="crackhost2" style="zoom:80%;" />
+<img src="./imgs/crackhost2.png" alt="crackhost2" style="zoom:80%;" />
 
 Entry Point of the attack：`192.168.29.207:55150->192.168.29.145:22`
 
-PoI (point of interest) event：`/home/maicha/normal.txt`
+PoI (point of interest) event：`/tmp/john/password_crack.txt`
 
 
 
