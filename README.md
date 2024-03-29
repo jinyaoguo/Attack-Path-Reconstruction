@@ -1,8 +1,8 @@
-# Attack Analysis System Based on Syslog
+# Attack Path Reconstruction
 
 ## Introduction
 
-This project is based on system logs and alarm information to conduct trace analysis of received attacks. Given the log files and alarm events as input, it can automatically generate attack chain diagrams and attack entry point information for further analysis by security personnel. This project refers to the idea of Fang et al. [1], and after reproducing it, optimizations were made in the attack path recognition and weight normalization parts.
+This project is based on system logs and alarm information to conduct trace analysis of received attacks. Given the log files and alarm events as input, it can reconstruct attack chain diagrams and identify attack entry for further analysis. This project refers to the idea of Fang et al. [1], and after reproducing it, optimizations were made in the attack path recognition and weight normalization parts.
 
 Architecture：
 
