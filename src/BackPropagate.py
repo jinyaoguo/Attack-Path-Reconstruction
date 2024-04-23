@@ -39,12 +39,12 @@ class Graph:
 
     @staticmethod
     def get_entity_shape(entity):
-        if len(entity.split('.')) >= 4 and len(entity.split(':')) >= 2:
-            return 'parallelogram'
-        if '/' in entity:
-            return 'ellipse'
+        if len(entity.split(".")) >= 4 and len(entity.split(":")) >= 2:
+            return "parallelogram"
+        if "/" in entity:
+            return "ellipse"
         else:
-            return 'square'
+            return "square"
 
     def generate_graph(self, output_path: str, view: bool, info=False):
         """
@@ -59,14 +59,18 @@ class Graph:
             dot.node(str(index + 1), label=entity, shape=self.get_entity_shape(entity))
         if info:
             for event in self.event_list:
-                dot.edge(str(self.entity_list.index(event[self.SRC]) + 1),
-                         str(self.entity_list.index(event[self.DST]) + 1),
-                         label=event[self.INDEX] + " " + event[self.TYPE])
+                dot.edge(
+                    str(self.entity_list.index(event[self.SRC]) + 1),
+                    str(self.entity_list.index(event[self.DST]) + 1),
+                    label=event[self.INDEX] + " " + event[self.TYPE],
+                )
         else:
             for event in self.event_list:
-                dot.edge(str(self.entity_list.index(event[self.SRC]) + 1),
-                         str(self.entity_list.index(event[self.DST]) + 1),
-                         label=event[self.INDEX])
+                dot.edge(
+                    str(self.entity_list.index(event[self.SRC]) + 1),
+                    str(self.entity_list.index(event[self.DST]) + 1),
+                    label=event[self.INDEX],
+                )
         if view:
             dot.render(output_path, view=False)
         else:
@@ -79,33 +83,48 @@ class Graph:
                 print(e)
                 raise
 
-    def draw_colorful_graph(self, output_path: str, entity_list: list, event_list: list, info=False):
+    def draw_colorful_graph(
+        self, output_path: str, entity_list: list, event_list: list, info=False
+    ):
         dot = Digraph()
         crucial = Digraph()
-        crucial.attr(color='blue')
-        crucial.attr(label='Attack path')
+        crucial.attr(color="blue")
+        crucial.attr(label="Attack path")
         for index, entity in enumerate(self.entity_list):
             if entity in entity_list:
-                crucial.node(str(index + 1), label=entity, shape=self.get_entity_shape(entity), color='red')
+                crucial.node(
+                    str(index + 1),
+                    label=entity,
+                    shape=self.get_entity_shape(entity),
+                    color="red",
+                )
             else:
-                dot.node(str(index + 1), label=entity, shape=self.get_entity_shape(entity))
+                dot.node(
+                    str(index + 1), label=entity, shape=self.get_entity_shape(entity)
+                )
         if info:
             for event in self.event_list:
                 if event[self.INDEX] in event_list:
-                    crucial.edge(str(self.entity_list.index(event[self.SRC]) + 1),
-                                 str(self.entity_list.index(event[self.DST]) + 1),
-                                 label=event[self.INDEX] + " " + event[self.TYPE],
-                                 color='red',
-                                 style="bold")
+                    crucial.edge(
+                        str(self.entity_list.index(event[self.SRC]) + 1),
+                        str(self.entity_list.index(event[self.DST]) + 1),
+                        label=event[self.INDEX] + " " + event[self.TYPE],
+                        color="red",
+                        style="bold",
+                    )
                 else:
-                    dot.edge(str(self.entity_list.index(event[self.SRC]) + 1),
-                             str(self.entity_list.index(event[self.DST]) + 1),
-                             label=event[self.INDEX] + " " + event[self.TYPE])
+                    dot.edge(
+                        str(self.entity_list.index(event[self.SRC]) + 1),
+                        str(self.entity_list.index(event[self.DST]) + 1),
+                        label=event[self.INDEX] + " " + event[self.TYPE],
+                    )
         else:
             for event in self.event_list:
-                dot.edge(str(self.entity_list.index(event[self.SRC]) + 1),
-                         str(self.entity_list.index(event[self.DST]) + 1),
-                         label=event[self.INDEX])
+                dot.edge(
+                    str(self.entity_list.index(event[self.SRC]) + 1),
+                    str(self.entity_list.index(event[self.DST]) + 1),
+                    label=event[self.INDEX],
+                )
         dot.subgraph(crucial)
         dot.render(output_path, view=True)
 
@@ -147,17 +166,27 @@ class Graph:
         increase order if reverse=False
         :return: sorted list
         """
-        return sorted(self.entity_reputation.items(), key=lambda x: x[1], reverse=reverse)
+        return sorted(
+            self.entity_reputation.items(), key=lambda x: x[1], reverse=reverse
+        )
 
 
 class BackwardPropagate:
     """
     Identify critical edges and attack entries from given log files.
     """
+
     time_limit = 60
 
-    def __init__(self, log_path: str, output_path: str, poi_event: str, detection_size=0, high_reputation='',
-                 poi_time=''):
+    def __init__(
+        self,
+        log_path: str,
+        output_path: str,
+        poi_event: str,
+        detection_size=0,
+        high_reputation="",
+        poi_time="",
+    ):
         """
 
         :param log_path: path of original log file
@@ -184,12 +213,14 @@ class BackwardPropagate:
             print(e)
             raise
 
-        if poi_time == '':
+        if poi_time == "":
             self.poi_time = 0
             for event in original_log_list:
                 event = event.split(" ")
-                if event[self.original_graph.DST] == self.poi_event and \
-                        float(event[self.original_graph.END_TIME][3:]) > self.poi_time:
+                if (
+                    event[self.original_graph.DST] == self.poi_event
+                    and float(event[self.original_graph.END_TIME][3:]) > self.poi_time
+                ):
                     self.poi_time = float(event[self.original_graph.END_TIME][3:])
         else:
             if len(poi_time) > 16:
@@ -228,27 +259,31 @@ class BackwardPropagate:
         self.entity_impact_backpropagation(self.merged_backward_graph)
         res = self.get_candidate_entry_point(self.merged_backward_graph)
         starts = []
-        print("Please set interested entry points to conduct forward analysis. Set the first 3 entities as default")
+        print(
+            "Please set interested entry points to conduct forward analysis. Set the first 3 entities as default"
+        )
         print("Input 'Enter' to continue")
         arr = input()
-        if arr == '':
+        if arr == "":
             for candidates in res:
                 for candidate in list(candidates.keys())[:3]:
                     starts.append(candidate)
         else:
-            starts = arr.split(' ')
-        final_graph = self.combine_backward_forward_for_given_starts(starts, self.merged_backward_graph)
+            starts = arr.split(" ")
+        final_graph = self.combine_backward_forward_for_given_starts(
+            starts, self.merged_backward_graph
+        )
         print("finish weight compute, time cost: ", time.time() - self.start_time)
         self.get_attack_path(final_graph, starts)
 
     @staticmethod
     def get_entity_type(entity):
-        if len(entity.split('.')) >= 4 and len(entity.split(':')) >= 2:
-            return 'network'
-        if '/' in entity:
-            return 'file'
+        if len(entity.split(".")) >= 4 and len(entity.split(":")) >= 2:
+            return "network"
+        if "/" in entity:
+            return "file"
         else:
-            return 'process'
+            return "process"
 
     def backward_analysis(self, graph: Graph):
         """
@@ -257,13 +292,16 @@ class BackwardPropagate:
         """
         entity_list = [self.poi_event]
         event_list = []
-        last_entity = ''
+        last_entity = ""
         index = 0
 
         # get poi_event
         for event in graph.event_list:
-            if event[graph.DST] == self.poi_event and float(event[graph.END_TIME][3:]) == self.poi_time \
-                    and event not in event_list:
+            if (
+                event[graph.DST] == self.poi_event
+                and float(event[graph.END_TIME][3:]) == self.poi_time
+                and event not in event_list
+            ):
                 event_list.append(event)
                 new_entity = event[graph.SRC]
                 if new_entity not in entity_list:
@@ -279,8 +317,9 @@ class BackwardPropagate:
             accessed_entity.append(event_cur[graph.SRC])
             for event in graph.get_incoming_edge_dict()[event_cur[graph.SRC]]:
                 # if event not in event_list:
-                if event not in event_list and float(event[graph.START_TIME][3:]) <= float(
-                        event_cur[graph.END_TIME][3:]):
+                if event not in event_list and float(
+                    event[graph.START_TIME][3:]
+                ) <= float(event_cur[graph.END_TIME][3:]):
                     event_list.append(event)
                     new_entity = event[graph.SRC]
                     if new_entity not in entity_list:
@@ -314,16 +353,24 @@ class BackwardPropagate:
         :return:
         """
         start_time = event1[graph.START_TIME]
-        if int(event1[graph.START_TIME].split('.')[1]) > int(event2[graph.START_TIME].split('.')[1]):
+        if int(event1[graph.START_TIME].split(".")[1]) > int(
+            event2[graph.START_TIME].split(".")[1]
+        ):
             start_time = event2[graph.START_TIME]
 
-        if int(event1[graph.END_TIME].split('.')[0]) < int(event2[graph.END_TIME].split('.')[0]):
+        if int(event1[graph.END_TIME].split(".")[0]) < int(
+            event2[graph.END_TIME].split(".")[0]
+        ):
             end_time = event2[graph.END_TIME]
             return start_time, end_time
-        if int(event1[graph.END_TIME].split('.')[0]) > int(event2[graph.END_TIME].split('.')[0]):
+        if int(event1[graph.END_TIME].split(".")[0]) > int(
+            event2[graph.END_TIME].split(".")[0]
+        ):
             end_time = event1[graph.END_TIME]
             return start_time, end_time
-        if int(event1[graph.END_TIME].split('.')[1]) < int(event2[graph.END_TIME].split('.')[1]):
+        if int(event1[graph.END_TIME].split(".")[1]) < int(
+            event2[graph.END_TIME].split(".")[1]
+        ):
             end_time = event2[graph.END_TIME]
         else:
             end_time = event1[graph.END_TIME]
@@ -340,7 +387,7 @@ class BackwardPropagate:
         edge_list = graph.event_list
         entity_list = graph.entity_list
         # sort by start time
-        edge_list.sort(key=lambda x: (int(x[graph.START_TIME].split('.')[0])))
+        edge_list.sort(key=lambda x: (int(x[graph.START_TIME].split(".")[0])))
 
         for event in edge_list:
             sys_call = event[graph.TYPE]
@@ -353,10 +400,14 @@ class BackwardPropagate:
             else:
                 candidate_log = stacks[(src, dst, sys_call)].pop(-1)
                 if self.time_threshold_check(candidate_log, event, graph):
-                    start_time, end_time = self.find_start_end_time(candidate_log, event, graph)
+                    start_time, end_time = self.find_start_end_time(
+                        candidate_log, event, graph
+                    )
                     candidate_log[graph.START_TIME] = start_time
                     candidate_log[graph.END_TIME] = end_time
-                    candidate_log[graph.SIZE] = str(int(candidate_log[graph.SIZE]) + int(event[graph.SIZE]))
+                    candidate_log[graph.SIZE] = str(
+                        int(candidate_log[graph.SIZE]) + int(event[graph.SIZE])
+                    )
                     stacks[(src, dst, sys_call)].append(candidate_log)
                     log_final[candidate_log[0]] = candidate_log
 
@@ -372,8 +423,11 @@ class BackwardPropagate:
         """
         target_list = [self.detection_size]
         for event in graph.event_list:
-            if event[graph.TYPE] == 'execve' and self.get_entity_type(event[graph.SRC]) == 'file' \
-                    and len(graph.get_incoming_edge_dict()[event[graph.SRC]]) != 0:
+            if (
+                event[graph.TYPE] == "execve"
+                and self.get_entity_type(event[graph.SRC]) == "file"
+                and len(graph.get_incoming_edge_dict()[event[graph.SRC]]) != 0
+            ):
                 max_size = 0
                 for event in graph.get_incoming_edge_dict()[event[graph.SRC]]:
                     # if int(event[graph.SIZE]) > max_size:
@@ -400,11 +454,14 @@ class BackwardPropagate:
         """
         for event in graph.event_list:
             if float(event[graph.END_TIME][3:]) == self.poi_time:
-                mini_diff = 1.0E-10
+                mini_diff = 1.0e-10
                 time_weight = math.log(1.0 + 1.0 / abs(mini_diff))
                 event.append(time_weight)
             else:
-                time_weight = math.log(1.0 + 1.0 / abs(self.poi_time - float(event[graph.END_TIME][3:])), math.e)
+                time_weight = math.log(
+                    1.0 + 1.0 / abs(self.poi_time - float(event[graph.END_TIME][3:])),
+                    math.e,
+                )
                 event.append(time_weight)
 
     def compute_struct_weight(self, graph: Graph):
@@ -418,8 +475,9 @@ class BackwardPropagate:
             if entity == self.poi_event:
                 concentration_weight = len(graph.event_list) * 1.0
             else:
-                concentration_weight = \
-                    len(graph.get_outgoing_edge_dict()[entity]) / len(graph.get_incoming_edge_dict()[entity])
+                concentration_weight = len(
+                    graph.get_outgoing_edge_dict()[entity]
+                ) / len(graph.get_incoming_edge_dict()[entity])
             event.append(concentration_weight)
 
     @staticmethod
@@ -441,10 +499,16 @@ class BackwardPropagate:
                 time_total_weight += out_edge[graph.TIME_W]
                 struct_total_weight += out_edge[graph.STRUC_W]
             for out_edge in outgoing:
-                out_edge[graph.SIZE_W] = out_edge[graph.SIZE_W] / size_total_weight * len(outgoing)
-                out_edge[graph.TIME_W] = out_edge[graph.TIME_W] / time_total_weight * len(outgoing)
+                out_edge[graph.SIZE_W] = (
+                    out_edge[graph.SIZE_W] / size_total_weight * len(outgoing)
+                )
+                out_edge[graph.TIME_W] = (
+                    out_edge[graph.TIME_W] / time_total_weight * len(outgoing)
+                )
                 if struct_total_weight != 0:
-                    out_edge[graph.STRUC_W] = out_edge[graph.STRUC_W] / struct_total_weight * len(outgoing)
+                    out_edge[graph.STRUC_W] = (
+                        out_edge[graph.STRUC_W] / struct_total_weight * len(outgoing)
+                    )
 
     @staticmethod
     def cluster_edges(weight_matrix, clustering_method):
@@ -456,16 +520,22 @@ class BackwardPropagate:
         """
         cluster_result = None
         if clustering_method == "kmeans++":
-            kmeans_model = KMeans(n_clusters=2, init="k-means++", n_init=1).fit(weight_matrix)
+            kmeans_model = KMeans(n_clusters=2, init="k-means++", n_init=1).fit(
+                weight_matrix
+            )
             cluster_result = kmeans_model.labels_
         elif clustering_method == "multi_kmeans++":
-            kmeans_model = KMeans(n_clusters=2, init="k-means++", n_init=20).fit(weight_matrix)
+            kmeans_model = KMeans(n_clusters=2, init="k-means++", n_init=20).fit(
+                weight_matrix
+            )
             cluster_result = kmeans_model.labels_
         else:
             raise Exception("Do not support the clustering method " + clustering_method)
         return cluster_result
 
-    def adjust_projection_direction(self, graph: Graph, cluster_dict: dict, final_weight):
+    def adjust_projection_direction(
+        self, graph: Graph, cluster_dict: dict, final_weight
+    ):
         """
         make sure critical edge set has larger weight
         :param graph:
@@ -479,13 +549,13 @@ class BackwardPropagate:
         final_weight_g1 = []
         for index, edge in enumerate(graph.event_list):
             if edge[graph.DST] == self.poi_event:
-                if cluster_dict[edge[graph.INDEX]] == '0':
+                if cluster_dict[edge[graph.INDEX]] == "0":
                     seed_edge_in_g0 = True
-                if cluster_dict[edge[graph.INDEX]] == '1':
+                if cluster_dict[edge[graph.INDEX]] == "1":
                     seed_edge_in_g1 = True
-            if cluster_dict[edge[graph.INDEX]] == '0':
+            if cluster_dict[edge[graph.INDEX]] == "0":
                 final_weight_g0.append(final_weight[index])
-            if cluster_dict[edge[graph.INDEX]] == '1':
+            if cluster_dict[edge[graph.INDEX]] == "1":
                 final_weight_g1.append(final_weight[index])
 
         mean_g0 = np.mean(np.array(final_weight_g0))
@@ -493,16 +563,16 @@ class BackwardPropagate:
         if seed_edge_in_g0 and not seed_edge_in_g1:
             if mean_g0 < mean_g1:
                 print("Cluster 0 has seed edges but cluster 1 hasn't.")
-                final_weight *= (-1)
+                final_weight *= -1
         elif seed_edge_in_g1 and not seed_edge_in_g0:
             if mean_g1 < mean_g0:
                 print("Cluster 1 has seed edges but cluster 0 hasn't.")
-                final_weight *= (-1)
+                final_weight *= -1
         else:
             if len(final_weight_g0) < len(final_weight_g1) and mean_g0 < mean_g1:
-                final_weight *= (-1)
+                final_weight *= -1
             elif len(final_weight_g1) < len(final_weight_g0) and mean_g1 < mean_g0:
-                final_weight *= (-1)
+                final_weight *= -1
 
     @staticmethod
     def scale_range(numbers: np.ndarray):
@@ -526,8 +596,18 @@ class BackwardPropagate:
                 second_min = value
 
         offset = second_min - min_value / 100
-        print("Scaling statistics --- min:", min_value, "max:", max_value, "secondMin:", second_min, "offset:", offset,
-              "scaledMin:", offset / (max_value - min_value))
+        print(
+            "Scaling statistics --- min:",
+            min_value,
+            "max:",
+            max_value,
+            "secondMin:",
+            second_min,
+            "offset:",
+            offset,
+            "scaledMin:",
+            offset / (max_value - min_value),
+        )
         for index, value in enumerate(numbers):
             numbers[index] = (value - min_value + offset) / (max_value - min_value)
 
@@ -540,7 +620,7 @@ class BackwardPropagate:
         """
         weights_list = []
         for edge in graph.event_list:
-            weights_list.append(edge[graph.SIZE_W: graph.STRUC_W + 1])
+            weights_list.append(edge[graph.SIZE_W : graph.STRUC_W + 1])
         weight_array = np.array(weights_list)
         cluster_result = self.cluster_edges(weight_array, "multi_kmeans++")
         cluster_dict = {}
@@ -592,7 +672,7 @@ class BackwardPropagate:
         fluctuation = 1
         iter_time = 0
 
-        while fluctuation >= 1.0E-13:
+        while fluctuation >= 1.0e-13:
             cumulative_diff = 0
             iter_time += 1
 
@@ -606,7 +686,11 @@ class BackwardPropagate:
                 graph.set_reputation(entity, rep)
             fluctuation = cumulative_diff
 
-        print("After {} times iteration, the reputation of each vertex is stable".format(iter_time))
+        print(
+            "After {} times iteration, the reputation of each vertex is stable".format(
+                iter_time
+            )
+        )
 
     def get_candidate_entry_point(self, graph: Graph):
         """
@@ -619,23 +703,25 @@ class BackwardPropagate:
         ip_candidate = {}
         file_candidate = {}
         entity_reputation_list = graph.sort_reputation()
-        for (entity, reputation) in entity_reputation_list:
-            if len(entity.split('.')) >= 4 and len(entity.split(':')) >= 2:
-                [ip1, ip2] = entity.split('->')
-                if ip1.startswith('127') and ip2.startswith('127'):
+        for entity, reputation in entity_reputation_list:
+            if len(entity.split(".")) >= 4 and len(entity.split(":")) >= 2:
+                [ip1, ip2] = entity.split("->")
+                if ip1.startswith("127") and ip2.startswith("127"):
                     continue
                 ip_candidate[entity] = graph.get_reputation(entity)
-            elif '/' in entity:
+            elif "/" in entity:
                 # if entity not in libraries and len(graph.get_incoming_edge_dict()[entity]) == 0:
                 #     file_candidate[entity] = graph.get_reputation(entity)
-                if len(graph.get_incoming_edge_dict()[entity]) == 0 and not library.is_lib(entity):
+                if len(
+                    graph.get_incoming_edge_dict()[entity]
+                ) == 0 and not library.is_lib(entity):
                     file_candidate[entity] = graph.get_reputation(entity)
             else:
                 source_ip = False
                 source_process = False
                 for edge in graph.get_incoming_edge_dict()[entity]:
                     node = edge[graph.SRC]
-                    if len(node.split('.')) >= 4 and len(node.split(':')) >= 2:
+                    if len(node.split(".")) >= 4 and len(node.split(":")) >= 2:
                         source_ip = True
                         break
                     if self.get_entity_type(node) == "process":
@@ -655,10 +741,15 @@ class BackwardPropagate:
             print(entity, reputation)
         print("=========================================================")
         res = [process_candidate, ip_candidate, file_candidate]
-        print("Entry Num: ", len(process_candidate) + len(ip_candidate) + len(file_candidate))
+        print(
+            "Entry Num: ",
+            len(process_candidate) + len(ip_candidate) + len(file_candidate),
+        )
         return res
 
-    def combine_backward_forward_for_given_starts(self, starts: list, backward_graph: Graph):
+    def combine_backward_forward_for_given_starts(
+        self, starts: list, backward_graph: Graph
+    ):
         """
         get the edges that both in backward graph and forward graph
         :param starts: the start entities to generate forward graph
@@ -666,7 +757,9 @@ class BackwardPropagate:
         :return:
         """
         forward_analyser = ForwardAnalysis(self.original_graph)
-        forward_graphs = forward_analyser.multiple_forward_analysis(starts, self.poi_time)
+        forward_graphs = forward_analyser.multiple_forward_analysis(
+            starts, self.poi_time
+        )
         forward_graph_edge_union = {}
         for graph in forward_graphs:
             for edge in graph.event_list:
@@ -693,7 +786,9 @@ class BackwardPropagate:
         #     print(edge)
 
         final_graph = Graph(filter_entity, filter_edge)
-        final_graph.generate_graph(self.output_path + "_Final.dot", view=False, info=True)
+        final_graph.generate_graph(
+            self.output_path + "_Final.dot", view=False, info=True
+        )
         return final_graph
 
     def get_attack_path(self, graph: Graph, entry_list: list):
@@ -706,9 +801,15 @@ class BackwardPropagate:
                 if new_entity not in entity_dict.keys():
                     path = entity_dict[self.poi_event].path.copy()
                     path.append(new_entity)
-                    entity_dict[new_entity] = Node(new_entity, path, entity_dict[self.poi_event],
-                                                   ' '.join(event[graph.INDEX:graph.END_TIME + 1]),
-                                                   1, event[graph.FINAL_W], event[graph.FINAL_W])
+                    entity_dict[new_entity] = Node(
+                        new_entity,
+                        path,
+                        entity_dict[self.poi_event],
+                        " ".join(event[graph.INDEX : graph.END_TIME + 1]),
+                        1,
+                        event[graph.FINAL_W],
+                        event[graph.FINAL_W],
+                    )
 
         index = 0
         while index < len(list(entity_dict.keys())):
@@ -727,12 +828,24 @@ class BackwardPropagate:
                     path = father_node.path.copy()
                     path.append(new_entity)
                     if new_entity not in entity_dict.keys():
-                        entity_dict[new_entity] = Node(new_entity, path, father_node,
-                                                       ' '.join(event[graph.INDEX:graph.END_TIME + 1]),
-                                                       hop, weight, avg_weight)
+                        entity_dict[new_entity] = Node(
+                            new_entity,
+                            path,
+                            father_node,
+                            " ".join(event[graph.INDEX : graph.END_TIME + 1]),
+                            hop,
+                            weight,
+                            avg_weight,
+                        )
                     elif avg_weight > entity_dict[new_entity].avg_weight:
-                        entity_dict[new_entity].set(path, father_node, ' '.join(event[graph.INDEX:graph.END_TIME + 1]),
-                                                    hop, weight, avg_weight)
+                        entity_dict[new_entity].set(
+                            path,
+                            father_node,
+                            " ".join(event[graph.INDEX : graph.END_TIME + 1]),
+                            hop,
+                            weight,
+                            avg_weight,
+                        )
 
         path_entity = {}
         path_event = {}
@@ -744,13 +857,19 @@ class BackwardPropagate:
                 # circle in the graph
                 if cur_node.father.name in entity_list:
                     break
-                event_list.append(cur_node.father_event.split(' '))
+                event_list.append(cur_node.father_event.split(" "))
                 cur_node = cur_node.father
                 entity_list.append(cur_node.name)
             path_entity[entity] = entity_list
             path_event[entity] = event_list
 
-        path_entity = dict(sorted(path_entity.items(), key=lambda item: entity_dict[item[0]].avg_weight, reverse=True))
+        path_entity = dict(
+            sorted(
+                path_entity.items(),
+                key=lambda item: entity_dict[item[0]].avg_weight,
+                reverse=True,
+            )
+        )
 
         crucial_entity = []
         crucial_event = []
@@ -758,7 +877,9 @@ class BackwardPropagate:
         for key in path_entity.keys():
             count += 1
             path_graph = Graph(path_entity[key], path_event[key])
-            path_graph.generate_graph(self.output_path + "_path/" + str(count) + ".dot", view=True, info=True)
+            path_graph.generate_graph(
+                self.output_path + "_path/" + str(count) + ".dot", view=True, info=True
+            )
             for entity in path_entity[key]:
                 if entity not in crucial_entity:
                     crucial_entity.append(entity)
@@ -766,7 +887,12 @@ class BackwardPropagate:
                 if event[graph.INDEX] not in crucial_event:
                     crucial_event.append(event[graph.INDEX])
 
-        graph.draw_colorful_graph(self.output_path + "_Final_color.dot", crucial_entity, crucial_event, info=True)
+        graph.draw_colorful_graph(
+            self.output_path + "_Final_color.dot",
+            crucial_entity,
+            crucial_event,
+            info=True,
+        )
 
         print("Attack path:")
         for key, value in path_entity.items():
@@ -774,7 +900,9 @@ class BackwardPropagate:
 
 
 class Node:
-    def __init__(self, name, path, father=None, father_event='', hop=0, weight=0, avg_weight=0):
+    def __init__(
+        self, name, path, father=None, father_event="", hop=0, weight=0, avg_weight=0
+    ):
         self.name = name
         self.father = father
         self.father_event = father_event
@@ -823,8 +951,8 @@ class ForwardAnalysis:
 
 class Library:
     def __init__(self):
-        self.prefix = ['/lib', '/usr/lib', '/usr/local/lib', '/lib64']
-        self.suffix = ['so', 'conf', 'pyc', 'cnf']
+        self.prefix = ["/lib", "/usr/lib", "/usr/local/lib", "/lib64"]
+        self.suffix = ["so", "conf", "pyc", "cnf"]
 
     def set_prefix(self, prefix: list):
         if prefix:
@@ -843,7 +971,7 @@ class Library:
         if not has_prefix:
             return False
         has_suffix = False
-        file_name = name.split('/')[-1].split('.')
+        file_name = name.split("/")[-1].split(".")
         file_name.reverse()
         for part in file_name:
             if part.isdigit():
@@ -852,4 +980,3 @@ class Library:
                 has_suffix = True
             break
         return has_suffix
-

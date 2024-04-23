@@ -3,6 +3,7 @@ import LogParser
 from argparse import ArgumentParser
 import os
 
+
 def get_args():
     ag = ArgumentParser()
     ag.add_argument("-n", "--name", help="log name")
@@ -30,8 +31,11 @@ def main():
 
     LogParser.log_filter(log_path, event_path)
     print("filter success!")
-    back_analyser = BackPropagate.BackwardPropagate(event_path, graph_path, poi_event, detection_size, high_rp)
+    back_analyser = BackPropagate.BackwardPropagate(
+        event_path, graph_path, poi_event, detection_size, high_rp
+    )
     back_analyser.run()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
